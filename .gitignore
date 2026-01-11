@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Archivos sensibles
+application.properties
+application-*.properties
+*.env
