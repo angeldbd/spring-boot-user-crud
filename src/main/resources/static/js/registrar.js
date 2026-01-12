@@ -21,6 +21,9 @@ async function registrarUsuario(){
         body: JSON.stringify(datos)
         });
 
+        alert('La cuenta fue creada con exito!');
+        window.location.href = 'usuarios.html'
+
         if (!request.ok) {
           throw new Error(`Error HTTP: ${request.status}`);
         }
