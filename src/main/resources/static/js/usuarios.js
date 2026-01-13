@@ -2,8 +2,12 @@
 $(document).ready(function() {
   //cargarUsuarios();
   $('#usuarios').DataTable({
-  ajax:{ url: 'api/usuarios',
-        dataSrc: ''},
+  ajax:{
+        url: 'api/usuarios',
+        dataSrc: '',
+        headers:getHeaders(),
+        type: 'GET'
+        },
   columns:[
   {data: 'id'},
   {data: 'nombre'},
@@ -16,7 +20,12 @@ $(document).ready(function() {
   }}
   ]
   });
+  actualizarEmailDelUsuario();
 });
+
+function actualizarEmailDelUsuario() {
+    document.getElementById('txt-email-usuario').outerHTML = localStorage.email;
+}
 
 $('#usuarios').on('click', '.btnEliminar', function () {
   const id = $(this).data('id');
@@ -35,10 +44,7 @@ async function cargarUsuarios(){
 
         const request = await fetch('api/usuarios', {
         method: 'GET',
-        headers:{
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
+        headers: getHeaders()
         });
 
         if (!request.ok) {
@@ -67,16 +73,21 @@ async function cargarUsuarios(){
 
 }
 
+function getHeaders() {
+    return {
+     'Accept': 'application/json',
+     'Content-Type': 'application/json',
+     'Authorization': localStorage.token
+   };
+}
+
 async function eliminarUsuario(id){
     if(!confirm('¿Desea eliminar este usuario? ')){
             return;
         }
     const request = await fetch('api/usuarios/' + id, {
             method: 'DELETE',
-            headers:{
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
+            headers: getHeaders()
             });
 
             if (!request.ok) {
