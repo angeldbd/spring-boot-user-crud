@@ -1,6 +1,8 @@
 package com.cursojava.curso.utils;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
@@ -63,6 +65,7 @@ public class JWTUtil {
      */
     public String getValue(String jwt) {
         // En la versión nueva se usa parser() -> verifyWith() -> build()
+        try {
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -70,12 +73,20 @@ public class JWTUtil {
                 .getPayload();
 
         return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+        log.error("Token expirado: {}", e.getMessage());
+        return null;
+        } catch (JwtException e) {
+        log.error("Token inválido: {}", e.getMessage());
+        return null;
+    }
     }
 
     /**
      * Method to validate and read the JWT
      */
     public String getKey(String jwt) {
+        try{
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -83,5 +94,30 @@ public class JWTUtil {
                 .getPayload();
 
         return claims.getId();
+        } catch (ExpiredJwtException e) {
+        log.error("Token expirado: {}", e.getMessage());
+        return null;
+        } catch (JwtException e) {
+        log.error("Token inválido: {}", e.getMessage());
+        return null;
+        }
     }
+
+    /**
+     * Para mayor seguridad *
+     * @return true si el token es válido, false si no
+     */
+    public boolean isTokenValid(String jwt) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(jwt);
+            return true;
+        } catch (JwtException e) {
+            log.error("Token inválido: {}", e.getMessage());
+            return false;
+        }
+    }
+
 }

@@ -21,15 +21,15 @@ public class UsuarioController {
     private JWTUtil jwtUtil;
 
     @RequestMapping(value = "api/usuario/{id}", method = RequestMethod.GET)
-    public Usuario getUsuario(@PathVariable Long id){
-        Usuario usuario = new Usuario();
-        usuario.setId(id);
-        usuario.setNombre("Angel");
-        usuario.setApellido("Latin");
-        usuario.setEmail("angel_latinp@hotmial.com");
-        usuario.setTelefono("234231");
-        usuario.setPassword("sdfsdkj");
-        return usuario;
+    public Usuario getUsuario(@RequestHeader(value="Authorization") String token,
+                              @PathVariable Long id){
+        if (!validarToken(token)) { return null; }
+
+        List<Usuario> usuarios = usuarioDao.getUsuario();
+
+        return usuarios.stream()
+               .filter(u -> u.getId().equals(id))
+                .findFirst().orElse(null);
     }
 
     @RequestMapping(value = "api/usuarios", method = RequestMethod.GET)
@@ -43,17 +43,6 @@ public class UsuarioController {
     private boolean validarToken(String token) {
         String usuarioId = jwtUtil.getKey(token);
         return usuarioId != null;
-    }
-
-    @RequestMapping(value = "api/crearUsuario", method = RequestMethod.POST)
-    public void registrarUsuario(@RequestBody Usuario usuario){
-
-        // codigo para encriptar
-        Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
-        String hash = argon2.hash(1, 1024, 1, usuario.getPassword());
-        usuario.setPassword(hash);
-
-        usuarioDao.registrar(usuario);
     }
 
     @RequestMapping(value = "api/eliminar/{id}", method = RequestMethod.DELETE)
