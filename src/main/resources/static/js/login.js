@@ -1,12 +1,16 @@
 
 
 async function iniciarSesion(){
+    try{
+    let datos = {
+    email:document.getElementById('txtEmail').value,
+    password:document.getElementById('txtPassword').value
+    };
 
-console.log("no me veo en consola?")
-    let datos = {};
-    datos.email = document.getElementById('txtEmail').value;
-    datos.password = document.getElementById('txtPassword').value;
-    console.log("datos enviados")
+    if(!datos.email || !datos.password){
+        alert('Completa todos los campos');
+        return;
+    }
         const request = await fetch('api/login', {
         method: 'POST',
         headers:{
@@ -17,14 +21,22 @@ console.log("no me veo en consola?")
         });
 
         const respuesta = await request.text();
-        console.log(respuesta)
-        if(respuesta != 'FAIL'){
+
+        if(request.ok){
+
         localStorage.token = respuesta;
         localStorage.email =  datos.email;
         window.location.href = 'usuarios.html';
-        } else{
+        } else if(request.status === 401){
          alert('las credenciales son incorrectas');
-         throw new Error(`Error HTTP: ${request.status}`);
+         return;
+        } else {
+        alert('Error del servidor, Intenta nuevamente.')
+        return;
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    }
 
 }

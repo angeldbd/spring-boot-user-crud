@@ -13,4 +13,6 @@ public interface UsuarioDao {
     Usuario registrar(Usuario usuario);
 
     Usuario obtenerUsuarioPorCredenciales(Usuario usuario);
+
+    Usuario obtenerUsuarioPorID(Long id);
 }

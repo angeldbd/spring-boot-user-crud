@@ -53,9 +53,15 @@ public class UsuarioDaoImp implements UsuarioDao{
 
         String passwordHashed = lista.get(0).getPassword();
         Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
+
         if (argon2.verify(passwordHashed, usuario.getPassword())) {
             return lista.get(0);
         }
         return null;
+    }
+
+    @Override
+    public Usuario obtenerUsuarioPorID(Long id) {
+        return entityManager.find(Usuario.class, id);
     }
 }

@@ -6,11 +6,11 @@ async function registrarUsuario(){
 
     try{
     // 1. Validar campos vaciós
-    let datos = {;
-        nombre : document.getElementById('txtNombre').value.trim();
-        apellido : document.getElementById('txtApellido').value.trim();
-        email : document.getElementById('txtEmail').value.trim();
-        password : document.getElementById('txtPassword').value.trim();
+    let datos = {
+        nombre : document.getElementById('txtNombre').value.trim(),
+        apellido : document.getElementById('txtApellido').value.trim(),
+        email : document.getElementById('txtEmail').value.trim(),
+        password : document.getElementById('txtPassword').value.trim()
         };
 
     let repetirPassword = document.getElementById('txtRepetirPassword').value;

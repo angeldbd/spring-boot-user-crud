@@ -6,6 +6,8 @@ import com.cursojava.curso.utils.JWTUtil;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,14 +23,20 @@ public class AutController {
     private JWTUtil jwtUtil;
 
     @RequestMapping(value = "api/login", method = RequestMethod.POST)
-    public String login(@RequestBody Usuario usuario){
+    public ResponseEntity<String> login(@RequestBody Usuario usuario){
 
         Usuario usuarioLogueado = usuarioDao.obtenerUsuarioPorCredenciales(usuario);
+
         if(usuarioLogueado != null){
-            String tokenJwt = jwtUtil.create(String.valueOf(usuarioLogueado.getId()), usuarioLogueado.getEmail());
-            return tokenJwt;
+            String tokenJwt = jwtUtil.create(
+                    String.valueOf(usuarioLogueado.getId()),
+                    usuarioLogueado.getEmail()
+            );
+            return ResponseEntity.ok(tokenJwt);
         }
-        return "Fail";
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body("Credenciales incorrectas");
     }
 
     @RequestMapping(value = "api/registro", method = RequestMethod.POST)

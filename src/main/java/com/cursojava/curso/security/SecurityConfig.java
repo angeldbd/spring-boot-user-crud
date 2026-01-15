@@ -24,7 +24,13 @@ public class SecurityConfig {
                 // Configurar autorización de endpoints
                 .authorizeHttpRequests(auth -> auth
                         // Rutas públicas (sin autenticación)
-                        .requestMatchers("/api/login", "/api/registro").permitAll()
+                        .requestMatchers(
+                                "/*.html",           // Todos los HTML en la raíz
+                                "/css/**",           // CSS
+                                "/js/**",            // JavaScript
+                                "/images/**",        // Imágenes
+                                "/api/login",
+                                "/api/registro").permitAll()
 
                         // Rutas protegidas (requieren autenticación)
                         .requestMatchers("/api/usuarios", "/api/usuario/**", "/api/eliminar/**").authenticated()

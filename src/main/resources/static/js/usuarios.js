@@ -1,26 +1,48 @@
+// Validar token al vargar la página
+window.addEventListener('load', async function(){
+    if(!localStorage.token){
+    window.location.href = 'login.html';
+    return;
+    }
+    // Cargar usuarios solo si hay token
+    //await cargarUsuarios();
+
+})
+
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
   //cargarUsuarios();
   $('#usuarios').DataTable({
-  ajax:{
+    ajax:{
         url: 'api/usuarios',
         dataSrc: '',
         headers:getHeaders(),
-        type: 'GET'
+        type: 'GET',
+        error: function(xhr, error, code){
+            console.error('Error DataTables: ', xhr.status, error);
+            if(xhr.status === 401 || xhr.status === 403){
+                alert('Sesión expirada');
+                localStorage.clear();
+                window.location.href = 'login.html';
+                }
+            }
         },
-  columns:[
-  {data: 'id'},
-  {data: 'nombre'},
-  {data: 'email'},
-  {data: 'telefono'},
-  {data: 'id',
-  render: function(id){
-    return `<a href="#" class="btn btn-danger btnEliminar btn-circle btn-sm" data-id="${id}">
-            <i class="fas fa-trash"></i></a> `
-  }}
-  ]
+      columns:[
+          {data: 'id'},
+          {data: 'nombre'},
+          {data: 'email'},
+          {data: 'telefono'},
+          {data: 'id',
+          render: function(id){
+            return `<a href="#" class="btn btn-danger btnEliminar btn-circle btn-sm" data-id="${id}">
+                    <i class="fas fa-trash"></i></a> `
+          }
+        }
+      ]
   });
+
   actualizarEmailDelUsuario();
+
 });
 
 function actualizarEmailDelUsuario() {
@@ -30,11 +52,27 @@ function actualizarEmailDelUsuario() {
 $('#usuarios').on('click', '.btnEliminar', function () {
   const id = $(this).data('id');
 
+   if(!confirm('¿Desea eliminar este usuario?')){
+           return;
+   }
+
   fetch(`api/eliminar/${id}`, {
     method: 'DELETE'
-  }).then(() => {
-    $('#usuarios').DataTable().ajax.reload();
-  });
+  }).then((response) => {
+        if(response.ok){
+            $('#usuarios').DataTable().ajax.reload();
+        } else if(response.status === 401 || response.status === 403) {
+            alert('Sesión expirada');
+            localStorage.clar();
+            window.location.href = 'login.html';
+        } else {
+            aler('Error al eliminar usuario');
+        }
+    })
+    .catch(error => {
+            console.error('Error:', error);
+            alert('Error de conexión');
+        });
 });
 
 async function cargarUsuarios(){
@@ -77,7 +115,7 @@ function getHeaders() {
     return {
      'Accept': 'application/json',
      'Content-Type': 'application/json',
-     'Authorization': localStorage.token
+     'Authorization': 'Bearer ' + localStorage.token
    };
 }
 
